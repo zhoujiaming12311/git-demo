@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<title id="title">{{title}}</title>
+		<style>
+			[v-cloak]{
+				display: none;
+			}
+			.fontClass{
+				color: blue;
+			}
+			.errorClass{
+				background-color: red;
+			}
+			.active{
+				background-color: orange;
+			}
+			.alert-error{
+				background-color: deeppink;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="div1">
+			<h1 v-cloak @click="say">{{helloworld}}</h1>
+			自定义修饰符：<input type="text" v-on:keyup.65="say" />
+			用户名：<input type="text" v-on:keydown.delete="clearContent" v-model="username">
+			密码：<input type="password" v-on:keyup.enter="show" v-model="password">
+		</div>
+
+		<div id="div2">
+			<input type="text" :class="{active:isActive}" v-model="number1">
+			<input type="text" v-bind:class="active" :style="objStyle" v-model="number2">
+			<input type="submit" @click="add" value="计算" />
+			<p>{{result}}</p>
+		</div>
+		<br>
+		<div id="app">
+			<ul :style="ulList">
+				<li :style="tagList" :key="item.id" v-for='(item,index) in tag' @click="changeColor(index)">{{item.title}}</li>
+			</ul>
+			<div :style="pic">
+				<input  type="image" :src="path">
+			</div>
+		</div>
+		<br>
+		<div id="button-component">
+			<button-counter></button-counter>	
+			<button-counter></button-counter>	
+			<button-counter></button-counter>	
+		</div>
+		<br>
+		<div id="blog" :style="{ fontSize: postFontSize + 'em' }" >
+			<blog-post :title="123122" @changetext="text"  @input-text="text2"></blog-post>
+			{{searchText}}
+			<blog-post v-for="item in post" :key="item.id" :title="item.title" @changetext="text"></blog-post>
+		</div>
+		<br>
+		<div id="slot">
+			<alert-slot> <p>Something bad happened.</p></alert-slot>
+		</div>
+		<br>
+		<div id="reffer">
+			<input type="text" ref="ref1" @input="showRef">
+				<button-counter ref="ref2"></button-counter>
+		</div>
+		<br>
+		<div id="buttonA">
+			<button-countera></button-countera>	
+			<button-counterb></button-counterb>	
+			<button-countera></button-countera>	
+			<button-countera></button-countera>	
+		</div>
+	<!-- 	<br>
+		<div id="buttonB">
+			<mainVue></mainVue>	
+		</div> -->
+		<script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+		<!-- <script src="http://static.runoob.com/assets/vue/1.0.11/vue.min.js"></script> -->
+		<script>
+			/* 自定义修饰符 aaa的keycode为65 */
+			/* v-cloak指令实现纯文本刷新，即在vue内容替换前不显示{{}}内容：1.提供样式 2、添加v-cloak指令 */
+			var vm = new Vue({
+				el: "#title",
+				data: {
+					title: "day1"
+				}
+			})
+			var vm2 = new Vue({
+				el: "#div1",
+				data: {
+					helloworld: "Helloworld",
+					username: "",
+					password: ""
+				},
+				methods: {
+					say: function() {
+						console.log("nihao")
+					},
+					// 按enter键触发
+					show: function() {
+						console.log(this.username + "  " + this.password)
+					},
+					// 按delete键触发
+					clearContent: function() {
+						this.username = "";
+					}
+				}
+			})
+			// 利用v-model实现计算器 由于默认获取到的为字符串类型，因此需要转换
+			var vm3 = new Vue({
+				el: "#div2",
+				data: {
+					number1: "",
+					number2: "",
+					result: "",
+					/* 样式绑定的三种方式 class:1.对象2.数组 style:内联*/
+					font: 'fontClass',
+					error: 'errorClass',
+					isActive: true,
+					active: ['fontClass', 'errorClass'],
+					// style内联
+					objStyle: {
+						width: '200px',
+						height: '200px'
+					}
+
+				},
+				methods: {
+					add: function() {
+						this.isActive = !this.isActive;
+						this.result = parseInt(this.number1) + parseInt(this.number2)
+					}
+				}
+			})
+			// vue设计思路：1.设计html结构 2.编写vue对象，利用vue渲染页面
+			var vm4 = new Vue({
+				el: "#app",
+				data: {
+					tagList: {
+						"list-style": "none",
+						"border": "1px solid black",
+						"brorder-bottom":"0",
+						"width": "50px",
+						"float": "left",
+					},
+					pic: {
+						"border": "1px solid black",
+						"background":""
+					},
+					ulList: {
+						"overflow": "hidden",
+						"padding": "0",
+						"margin": "0"
+					},
+					tag: [{
+								id: "1",
+								title: "标签1",
+								background: "red"
+							},
+							{
+								id: "2",
+								title: "标签2",
+								background: "blue"
+							},
+							{
+								id: "3",
+								title: "标签3",
+								background: "green"
+							}
+						],
+					path:"./images/login_banner.png"
+					
+				},
+				methods:{
+					changeColor:function(index){
+						if(index=="0"){
+							this.pic.background='red'
+						}
+						if(index=="1"){
+							this.pic.background='blue'
+						}
+						if(index=="2"){
+							this.pic.background='green'
+						}
+					}
+				}
+			})
+			// 组件定义: 1.定义组件名：button-counter 2.定义data函数并return需要操作的内容 3.编写模板表达式定义template生成组件框架 4.定义父元素将模板放入
+			//vue全局注册是每个实例化的vue都可以使用，而局部则是实例化注册的那个可以用
+			// 全局注册：可以用在其被注册之后的任何 (通过 new Vue) 新创建的 Vue 根实例，也包括其组件树中的所有子组件的模板中
+			Vue.component('button-counter',{
+				 // 官方规定组件里的data必须是函数，才不会在同组件中相互干扰
+				data:function(){
+					 // 返回的变量可以直接在该组件的template上使用
+					return {
+						count:0	
+					}
+				},
+				template:"<button @click='count++'>please click it：{{count}}</button>"
+			})
+			new Vue({el:"#button-component"})
+			// 父子组件传值（通过父组件的data属性等）：父组件传子组件步骤：1、定义子组件中的props属性（相当于name/src）2、定义父组件 3、通过for in和v-bind循环取值赋值）2、定义父组件
+			Vue.component('blog-post',{
+				props:['title','value'],
+				// 模板字符串写法：在反引号``内部定义
+				template: 
+				`
+				   <div class="blog-post">
+							<h3>{{title}}</h3>
+							<button @click="$emit('changetext',0.1)">Enlarge text</button>
+							<input type="text"  v-bind:value="value" v-on:input="$emit('input-text', $event.target.value)"></input>
+					</div>
+				`
+			})
+			// 子组件传递父组件：1、在子组件上定义自定义事件（如：changetext且传入的事件名称只能使用小写,不能使用大写的驼峰规则命名）
+			// 2、在父组件上定义监听函数监听自定义事件，并编写相应数据传递值
+			// 3、在子组件上定义$emit函数，通过自定义事件触发父组件中的方法（相当于监听一个原生dom事件）,其中$emit中自定义事件不支持大小写识别（一律小写处理）
+			// 驼峰式写法命名的组件只能在字符串模板中使用，在普通标签模板中必须使用短横线方式
+			var vm5=new Vue({
+				el:"#blog",
+				data:{
+					post:[{id:1,title:"01"},{id:2,title:"02"},{id:3,title:"03"}],
+					postFontSize: 1,
+					searchText:""
+				},
+				methods:{
+					text:function(e){
+						// 子组件调用$emit方法的第二个参数传递数值
+						this.postFontSize = this.postFontSize+e
+					},
+					text2:function(e){
+						// 子组件调用$emit方法的第二个参数传递数值,以此实现v-model
+						this.searchText=e
+					}
+				}
+			})			
+			// 插槽-通俗上讲props可以将数据从父组件传入子组件，slot可以将html从父组件传入子组件。
+			// 也就是说组件下的所有内容（文字、div）都会传入slot内
+			Vue.component('alert-slot',{
+				template:
+				`
+					<div class="alert-error">
+						<strong>
+						ERROR!
+						</strong>
+						<slot></slot>
+					</div>
+				`
+			})
+			new Vue({el:"#slot"})
+			// 子组件（指向组件实例）或者dom元素（指向dom元素）可通过ref的方式注册引用信息到父组件的$refs，注册后父组件通过this调用访问子组件的信息
+			// 注册时需要在组件渲染后进行注册，渲染时在mounted阶段生成，在created阶段未生成
+			// 不同vue引用静态资源库可能有不同问题，建议使用csdn（例如v-for和ref渲染）
+			var vm6=new Vue(
+			{
+				el:"#reffer",
+				data:{name:"组件"},
+				mounted: function(){
+					console.log(this.$refs.ref1);
+					console.log(this.$refs.ref2);
+				},
+				methods:{
+					showRef:function(){
+						console.log(this.$refs.ref1);
+						console.log(this.$refs.ref2.count);
+					}
+				}
+			})
+			// 局部注册 vue全局注册是每个实例化的vue都可以使用，而局部则是实例化注册的那个父组件中可以用
+			//定义组件a
+			var first_component={
+				data:function(){
+					return {
+						count:0	
+					}
+				},
+				// 局部注册子组件 ‘组件名称’:‘变量名称’
+				components:{
+					'second_component':second_component
+				},
+				methods:{
+					handle:function(){
+						this.count+=2;
+					}
+				},
+				// 组件模板中包含1个以上的dom元素时，需要用1个root根元素包裹住（div等），不然会报错should contain exactly one root element
+				// 这是由于vue都需要在1个根元素（el相同）内定义
+				template:"<div><button @click='handle'>please click it：{{count}}</button><third_component></third_component></div>"
+				
+			}
+			// 定义组件b
+			var second_component={
+				data:function(){
+					return {
+						name:'zhoujiaming'
+					}
+				},
+				template:"<div>second name : {{name}}</div>"
+				
+			}
+			// 定义组件a的子组件
+			Vue.component('third_component',{
+				 // 官方规定组件里的data必须是函数，通过函数形成闭包才不会在同组件中相互干扰，使组件中的变量各自独立
+				data:function(){
+					 // 返回的变量可以直接在该组件的template上使用
+					return {
+						count:0	
+					}
+				},
+				template:"<button @click='count++'>(third_component)please click it：{{count}}</button>"
+			})
+			var vm7= new Vue({
+				el:"#buttonA",
+				components:{
+					'button-countera':first_component,
+					'button-counterb':second_component
+				}
+			})
+		
+		</script>
+	<!-- 	<script type="module">
+		
+		//模块化
+		import mainVue from "./componentMain.vue";
+		var vm8= new Vue({
+			el:"#buttonB",
+			components:{
+				'mainVue':mainVue
+			}
+		
+		})
+		</script> -->
+	</body>
+</html>
