@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+	</head>
+	<body>
+	</body>
+</html>
+<script type="text/javascript">
+	/**
+	 * 前后端通讯技术：1.ajax2.fetch3.axios 
+	 * 1.ajax jquery
+	 * 2.fetch（api） es6
+	 * 3.axios(三方库)
+	 * 当一个请求url的协议、域名、端口三者之间任意一个与当前页面url不同即为跨域
+	 * 返回格式：json
+	 * 请求方式：get post 
+	 */
+	// ajax 方式：其中在url输入地址，在type中决定提交请求方式，在data中决定提交数据，在success中得到查询结果。由于是异步编程，该操作会导致查询结果延迟返回，影响上下文的处理（也就是说写的顺序不代表执行的顺序）
+	$.ajax({
+		url: "/Home/PostAlbum",
+		type: "POST",
+		dataType: "json",
+		data: {
+			AlbumName: "shanghai",
+			Entered: "5/9/2013"
+		},
+		success: function(result) {
+			alert(result);
+		},
+		error: function(xhr, status, p3, p4) {
+			var err = "Error " + " " + status + " " + p3;
+			if (xhr.responseText && xhr.responseText[0] == "{")
+				err = JSON.parse(xhr.responseText).message;
+			alert(err);
+		}
+	});
+	}
+	//嵌套调用，保证函数的顺序执行
+	$.ajax({
+		url: "/Home/PostAlbum",
+		type: "POST",
+		dataType: "json",
+		data: {
+			AlbumName: "shanghai",
+			Entered: "5/9/2013"
+		},
+		success: function(result) {
+			alert(result);
+			//嵌套调用
+			$.ajax({
+				url: "/Home/PostAlbum",
+				type: "POST",
+				dataType: "json",
+				data: {
+					AlbumName: "shanghai",
+					Entered: "5/9/2013"
+				},
+				success: function(result) {
+					alert(result);
+				},
+				error: function(xhr, status, p3, p4) {
+					var err = "Error " + " " + status + " " + p3;
+					if (xhr.responseText && xhr.responseText[0] == "{")
+						err = JSON.parse(xhr.responseText).message;
+					alert(err);
+				}
+			});
+		}
+	},
+	error: function(xhr, status, p3, p4) {
+		var err = "Error " + " " + status + " " + p3;
+		if (xhr.responseText && xhr.responseText[0] == "{")
+			err = JSON.parse(xhr.responseText).message;
+		alert(err);
+	}
+	});
+	}
+	// 用回调函数解决异步加载过程中函数调用问题
+	// 方式为：定义ajax函数时，在success中对用到的变量进行判断，如果变量未定义则不执行
+	function saveRecord(seq, callback) {
+		$.ajax({
+			url: '${root}/saveOrUpdate.do',
+			type: "post",
+			async: true,
+			success: function(result) {
+				if (callback != undefined) {
+					callback(true);
+				}
+			}
+		});
+	}
+	//保存成功，才会打开弹窗
+	function main(seq) {
+		saveRecord(seq, callbackFunction);
+
+	}
+
+	/*保存时的回调函数*/
+	function callbackFunction(saveSuccess) {
+		if (saveSuccess) {
+			//省略打开弹窗代码
+		}
+	}
+
+	/**
+	 * Promise 是异步编程的一种解决方案，从语法上讲它是一种对象，通过它可以异步操作信息。 
+	 * 使用Promise主要好处：
+	 * 1、避免多层异步调用（回调函数相互嵌套）
+	 * 2、提供简介api，使控制更加容易
+	 * 
+	 * console.log()会在浏览器控制台打印出信息
+	 * console.dir()可以显示一个对象的所有属性和方法
+	 * */
+
+	var p = new Promise(function(resolve, reject) {
+		setTimeout(function() {
+			var flag = true;
+			if (flag) {
+				// 成功处理
+				resolve('yes')
+			} else {
+				//失败处理
+				reject('error');
+			}
+		}, 100)
+	})
+	// p.then获取处理结果 data关联resolve/reject内容
+	p.then(function(data) {
+		console.log("success" + data)
+	}, function(info) {
+		console.log("failure" + info)
+	})
+	//链式调用处理多次回调，由回调处理转变成线式调用，增加代码可读性
+	//发送多个ajax请求并且保证顺序
+	queryData('http://localhost:3000/data')
+		.then(function(data) {
+			//接收queryData return结果 data
+			console.log(data)
+			return queryData('http://localhost:3000/data1');
+		})
+		.then(function(data) {
+			//接收上一个return结果 data1
+			console.log(data)
+			return queryData('http://localhost:3000/data2');
+		})
+		.then(function(data) {
+			//接收上一个return结果 data2
+			console.log(data)
+		})
+		/**
+		 * git架构：
+		 * git仓库：存放项目的地方
+		 * 暂存区：临时存放被修改的文件，大意指git存放每一次修改后的文件的位置
+		 * 工作目录：被git管理的项目目录，即写代码的地方
+		 * 
+		 * 提交流程：
+		 * 工作目录（修改的文件）->暂存区->git仓库
+		 * 
+		 * git配置：
+		 * 1、配置提交人姓名：git config --global user.name
+		 * 2、配置提交人email：git config --global user.email
+		 * 3、查看git配置信息：git config --list
+		 * eg：
+		 * 1、新建文件夹并打开
+		 * 2、右键->git bash here
+		 * 3、$ git config --global user.name zhoujiaming
+		 * （若想修改，重复步骤3即可）
+		 *
+		 * git提交步骤：
+		 * 1、git init 初始化git仓库
+		 * 2、git status 查看文件状态（git状态：管理/未管理，提醒开发者哪些未管理的文件需要管理）
+		 * 3、git add 追踪文件列表名  追踪文件（将要追踪的文件添加到暂存区中）
+		 * eg：$  git add day1.html 
+		 * warning: LF will be replaced by CRLF in day1.html.
+		 * The file will have its original line endings in your working directory
+		 * 原因是windows系统的换行符和Unix下的换行符不同，但是git会帮我们自动进行换行符的转换，所以出现了这个warning
+		 * 解决方法为禁止自动转换：git config --global core.autocrlf false
+		 * 4、git commit -m 提交信息 向仓库提交代码（将暂存区中的文件提交到工作仓库中。原则为每次只提交一个功能不要一次提交多个或这功能中包含bug的修改，因为会导致回退时其他功能或bug被一同回退）
+		 * eg：$ git commit -m 第一次提交
+		 * *** Please tell me who you are.
+		 * Run 
+		 * git config --global user.email "you@example.com"
+		 * git config --global user.name "Your Name"
+		 * 解决方法：当前文件夹下有个隐藏的.git文件夹，修改其中的config文件，末尾加入：
+		 * [user]
+		 * 		name = zhoujm
+		 * 		email = zhoujm@yusys.com.cn
+		 * 5、git log 查看提交记录
+		 * 6、git reset --hard commitID 根据id将指定记录恢复，并覆盖暂存区和工作目录
+		 * 
+		 * git撤销（撤销至最新一次add（可多次撤销至该节点）：即程序有问题想恢复到上一次正确的add提交版本）：git checkout 文件名(此时git status可查看当前状态)
+		 * git删除（删除暂存区文件中即add的文件：即add提交有问题不想让本次add提交存在）:git rm --cached 文件名
+		 * git恢复(从仓库中恢复指定记录，并覆盖暂存区和工作目录，即当前程序有问题且git提交的版本也有问题，想要恢复一个指定的版本)：git reset --hard commitID
+		 */
+</script>
