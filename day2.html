@@ -193,5 +193,9 @@
 		 * git撤销（撤销至最新一次add（可多次撤销至该节点）：即程序有问题想恢复到上一次正确的add提交版本）：git checkout 文件名(此时git status可查看当前状态)
 		 * git删除（删除暂存区文件中即add的文件：即add提交有问题不想让本次add提交存在）:git rm --cached 文件名
 		 * git恢复(从仓库中恢复指定记录，并覆盖暂存区和工作目录，即当前程序有问题且git提交的版本也有问题，想要恢复一个指定的版本)：git reset --hard commitID
-		 */
+		 * (git reset --hard commid_id该操作为强制回退到某一次历史commit的版本，并清除本地修改！执行后会清除该版本之前的所有记录，因此执行前每次必须commit！)
+		 * (一、没有commit，没有add 对不起，找不回了，放弃吧。
+		 * 二、没有commit，但是有add操作（建议git add –all） 执行：git fsck --lost-found)（找回本地仓库里边最近add的60或更多个文件:find .git/objects -type f | xargs ls -lt | sed 60q）
+		 * 三、执行过commit 1、git  reflog找到回退信息 2、git reset --hard HEAD@{回退位置} 
+		 * 
 </script>
