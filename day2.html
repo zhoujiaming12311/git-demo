@@ -198,4 +198,14 @@
 		 * 二、没有commit，但是有add操作（建议git add –all） 执行：git fsck --lost-found)（找回本地仓库里边最近add的60或更多个文件:find .git/objects -type f | xargs ls -lt | sed 60q）
 		 * 三、执行过commit 1、git  reflog找到回退信息 2、git reset --hard HEAD@{回退位置} 
 		 * 
+		 * 
+		 * git分支branch：
+		 * 主分支master：第一次向git仓库中提交的分支，一般用于上线发布
+		 * 开发分支develop：作文开发的分支，基于主分支的分支创建，等待测试验证后与与主分支合并上线。
+		 * 功能分支feature：基于开发分支创建，用于开发具体的功能，在开发完成后合并到开发分支
+		 * 功能分支->开发分支->主分支
+		 * 
+		 * 查看分支：git branch(* master *表示当前所属分支)
+		 * 
+		 * 
 </script>
