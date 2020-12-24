@@ -149,7 +149,7 @@
 			//接收上一个return结果 data2
 			console.log(data)
 		})
-		/**
+	/**
 		 * git架构：
 		 * git仓库：存放项目的地方
 		 * 暂存区：临时存放被修改的文件，大意指git存放每一次修改后的文件的位置
@@ -221,10 +221,22 @@
 		 * git branch -d 分支名（删除前如果版本不一致需要进行merge，否则不通过）
 		 * git branch -D 分支名(强制删除，无论是否存在冲突)
 		 * 
-		 * 暂时保存更改：
+		 * 暂时保存更改(适用于在分支上写程序时没写完却不想保存，但此时需要切换到其他分支干别的事情，此时可以放到临时工作区里（相当于剪切板）)：
 		 * 在git中暂时提取当前分支上所有改动的内容并存储，让开发人员能够得到一个干净的副本（即当时你改动的所有内容），临时转向其他的工作
 		 * 存储临时改动：git stash
 		 * 恢复改动：git stash pop（恢复改动时如果在其他分支上，则会将先前改动内容恢复到该分支）
+		 * （如果在其他分支也有改动并stash过，此时切换回原来分支会提示你需要对其他剪切版内容做出处理）
+		 * $ git stash pop
+		 * On branch develop
+		 * Changes to be committed:
+		 * (use "git restore --staged <file>..." to unstage)
+		 * new file:   develop.html
+		 * Changes not staged for commit:
+		 * (use "git add <file>..." to update what will be committed)
+		 * (use "git restore <file>..." to discard changes in working directory)
+		 * modified:   day2.html
 		 * 
+		 * 此时$ git add --all ->$ git stash pop
+		 * 结果会将两个分支临时内容都恢复到当前目录	
 		 */
 </script>
