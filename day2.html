@@ -158,6 +158,7 @@
 		 * 提交流程：
 		 * 工作目录（修改的文件）->暂存区->git仓库
 		 * 
+		 * 本地仓库：
 		 * git配置：
 		 * 1、配置提交人姓名：git config --global user.name
 		 * 2、配置提交人email：git config --global user.email
@@ -238,5 +239,14 @@
 		 * 
 		 * 此时$ git add --all ->$ git stash pop
 		 * 结果会将两个分支临时内容都恢复到当前目录	
+		 * 
+		 * 
+		 * 远程仓库（多人开发时使用）：
+		 * 1、A在自己计算机中创建本地仓库
+		 * 2、A在github中建立远程仓库
+		 * 3、A在本地仓库推送PUSH到远程仓库
+		 * 4、B克隆clone远程仓库到本地进行开发(clone创建本地副本)
+		 * 5、B将本地仓库中开发内容推送PUSH到远程仓库(push更新版本)
+		 * 6、A/B将远程仓库中的最新内容拉去pull本地(pull获取最新版本)
 		 */
 </script>
