@@ -16,25 +16,48 @@
 			 * CommonJS：1）模块分为包和单文件 2）模块成员的导出 export和module.exports 3）模块成员的导入require(‘模块标识符’)
 			 * 
 			 * es6模块化规范中定义（前端和服务器端通用）：1）每个js都是一个独立的模块 2）导入模块成员使用import关键字 3）暴露模块成员使用export关键字
-			 * 
+			 * Babel(Babel 是一个广泛使用的 ES6 转码器，可以将 ES6 代码转为 ES5 代码注意：Babel 默认只转换新的 JavaScript 句法（syntax），而不转换新的 API。)
 			 * 1、nodejs中通过babel体验ES6模块化：
-			 * npm install --save-dev @babel/core @babel/cli @babel/preset-env @babel/node
-			 * 
-			 * 
-			 * 
-			 * 
-			 * 
-			 * 
-			 * 
-			 * 
-			 * 
-			 * 
-			 * 
-			 * 
-			 * 
-			 * 
-			 * 
-			 * 
+			 * 1)npm install --save-dev @babel/core @babel/cli @babel/preset-env @babel/node( (--save是项目内安装,不是全局安装  -dev是开发时环境，开发时需要依赖，正式上线时不需要依赖的))	
+			 * 2)npm i --save @babel/polyfill (i时install的缩写 --save不带-dev，正式上线时需要的内容)
+			 * (Polyfill:Polyfill的准确意思为，用于实现浏览器并不支持的原生API的代码。)
+			 * (@babel/cli用于命令行转码,简化了命令行执行步骤)
+			 * (@babel/node工具提供了一个支持 ES6 的 REPL 交互式运行环境。在此环境中，我们可以做一些简单的代码调试。)
+			 * (@babel/core用于是把 js 代码分析成 ast ，方便各个插件分析语法进行相应的处理。有些新语法在低版本 js 中是不存在的，如箭头函数，rest 参数，函数默认值等，这种语言层面的不兼容只能通过将代码转为 ast，分析其语法后再转为低版本 js。)
+			 * 3)@babel/preset-env：新建babel.config.js ,根据你支持的环境自动决定适合你的Babel插件,以支持不同版本ECMA规范
+			 * 4)@babel/cli、@babel/node:新建index.js并编写相关es6内容,通过npx命令执行cli脚手架：npx babel-node .\index.js 将index.js中的结果输出
+			 * (npx调用项目内部安装的模块,如babel-node)
+			 * 模块化语法:
+			 * 1、默认导出/导入
+			 * 默认导出语法 export default 默认导出的成员
+			 * 默认导入语法 import 接收名称 from '模块标识符'
+			 * eg:
+			 * let a=1;
+			 * let c=2;
+			 * function show(){
+			 * }
+			 * export default{
+			 * 	a,c,show
+			 * }
+			 * import  m1 from './m1.js'
+			 * console.log(m1)
+			 * 注意：每个模块只允许一次export default否则报错！
+			 * 2、按需导出/导入
+			 * 按需导出：export let xx=4;
+			 * 按需导入：import {xx} from './m1.js'
+			 * 注意：import的内容需要与export的标识符一致,可以使用多次按需导出 
+			 * 3、默认+按需
+			 * 兼容写法：import m1 ,{xx,yy as xx2}from './m1.js'
+			 * (as表示起别名)
+			 * 4、直接导入并执行代码
+			 * 使用场景：只是单纯执行某个模块中的代码，并不需要得到该模块中向外暴露的成员
+			 * import './m2.js'
+			 * 注意：import直接导入并执行代码会优先执行
+			 * eg：
+			 * 1、import m1 ,{xx,yy as xx2}from './m1.js' 
+			 * 2、console.log(m1)
+			 * 3、import './m2.js'
+			 * 实际执行顺序为：1、3、2
 			 * 
 			 * 
 			 * 
