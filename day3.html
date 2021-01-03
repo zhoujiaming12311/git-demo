@@ -20,6 +20,9 @@
 			 * 1、nodejs中通过babel体验ES6模块化：
 			 * 1)npm install --save-dev @babel/core @babel/cli @babel/preset-env @babel/node( (--save是项目内安装,不是全局安装  -dev是开发时环境，开发时需要依赖，正式上线时不需要依赖的))	
 			 * 2)npm i --save @babel/polyfill (i时install的缩写 --save不带-dev，正式上线时需要的内容)
+			 * (npm安装缩写：-S即--save（保存），包名会被注册在package.json的dependencies里面，在生产环境下这个包的依赖依然存在)
+			 * (npm安装缩写：-D即--dev（生产），包名会被注册在package.json的devDependencies里面，仅在开发环境下存在的包用-D，如babel，sass-loader这些解析器）
+			 * (npm安装缩写：什么也不写，包名不会进入package.json里面，因此别人不知道你安装了这个包（...智障）)
 			 * (Polyfill:Polyfill的准确意思为，用于实现浏览器并不支持的原生API的代码。)
 			 * (@babel/cli用于命令行转码,简化了命令行执行步骤)
 			 * (@babel/node工具提供了一个支持 ES6 的 REPL 交互式运行环境。在此环境中，我们可以做一些简单的代码调试。)
@@ -27,6 +30,7 @@
 			 * 3)@babel/preset-env：新建babel.config.js ,根据你支持的环境自动决定适合你的Babel插件,以支持不同版本ECMA规范
 			 * 4)@babel/cli、@babel/node:新建index.js并编写相关es6内容,通过npx命令执行cli脚手架：npx babel-node .\index.js 将index.js中的结果输出
 			 * (npx调用项目内部安装的模块,如babel-node)
+			 * 
 			 * 模块化语法:
 			 * 1、默认导出/导入
 			 * 默认导出语法 export default 默认导出的成员
@@ -59,17 +63,124 @@
 			 * 3、import './m2.js'
 			 * 实际执行顺序为：1、3、2
 			 * 
+			 * webpack:
+			 * 1、新建空目录并运行npm init -y命令，初始化包管理配置文件package.json
+			 * 2、新建src
+			 * 3、新建首页index.html
+			 * 4、初始化结构
+			 * 5、运行npm install jquery -s 命令，安装jquery
+			 * 6、通过模块化的形式，实现列表隔行变色的效果
+			 * 
+			 * 在项目中安装和配置webpack
+			 * 1)运行npm i webpack webpack-cli -d命令，安装webpack相关的包
+			 * 2)在项目根目录中，创建名为webpack.config.js的webpack配置文件
+			 * 3)在webpack的配置文件中，初始化如下配置：
+			 * module.exports={
+			 * 		mode:'development'//mode用来指定构建模式（参数：development(转换后的代码不会压缩和混淆，转换时间小适用于开发时)、production(转换后的代码会压缩和混淆，转换时间长适用于上线时)
+			 * }
+			 * 4)在package.json配置文件中的scripts节点下，新增dev脚本如下：
+			 * "scripts":{
+			 * 		"dev":"webpack"//script节点下的脚本，可以通过npm run执行
+			 * }
+			 * 5)在终端中运行npm run dev 命令，启动webpack进行项目打包。
+			 * (webpack中,默认只能处理一部分es6的语法,一些更高级的es6和es7语法webpack不能处理,这时就需要第三方的loader即babel来帮助webpack来处理)
+			 * 
+			 * 手动配置打包的入口和出口:
+			 * 打包的入口文件：src -> index.js(打包混淆前源码)
+			 * 打包的出口文件：dist -> main.js(打包混淆后源码) 	
+			 * 如果要修改打包的出口和入口，可以在webpack.config.js中新增的如下配置信息：
+			 * const path = require('path')//导入node.js中专门操作路径的模块
+			 * moudle.exports={
+			 * 		entry:path.join(__dirname,'./src/index.js'),//打包时的入口文件的路径
+			 *      output:{
+			 * 			path:path.join(__dirname,'./dist'),//打包时的出口文件路径
+			 * 			filename:'bundle.js'//输出文件名称
+			 * 		}
+			 * }
+			 * (__dirname表示当前项目所处的根目录)
+			 * 
+			 * 自动打包步骤：
+			 * 1、运行 npm install webpack-dev-server -d 命令，安装自动打包工具
+			 * 2、修改package.json -> scripts 中的 dev，"dev": "webpack-dev-server"n
+			 * 3、将src-> index.html 中，script脚本的引用路径，修改为"/buldle.js“
+			 * 4、运行npm run dev
+			 * 5、在浏览器中访问http://localhost:8080地址，查看自动打包效果
+			 * (webpack-dev-server 主要提供两个功能：1)为静态文件提供服务 2)自动刷新和热替换(HMR))
+			 * 
+			 * 安装完成后，执行命令npm run dev 发现报错： Error: Cannot find module 'webpack-cli/bin/config-yargs’
+			 * 原因为：webpack-cli的版本与webpack-dev-server的版本不兼容。
+			 * 解决方案：
+			 * 1、npm uninstall webpack-cli -g       卸载全局
+			 * or npm uninstall webpack-cli -D      卸载局部(本地)
+			 * 2、npm i webpack-cli@3.3.12-D        局部安装(本地)   
+			 * 3、修改index.js
+			 *    path:path.join(__dirname,'/')
+			 * 4、修改index.html
+			 *    src="/blundle.js"
+			 * 注意： webpack-dev-server 帮我们打包生成的 bundle.js 文件，并没有放到 实际的 物理磁盘上；而是直接托管到了 电脑的内存中，所以，我们在 项目根目录中，根本找不到 这个打包好的 bundle.js；
+			 * 所以在引用文件的时候，路径是直接从根目录下的，如：
+			 * <script src='/bundle.js'>我们可以认为，webpack-dev-server 把打包好的文件，以一种虚拟的形式，托管到了 俺们的项目的 根目录中，虽然我们看不到它，但是，可以认为和 dist src node_modules 平级，有一个看不见的文件，叫做 bundle.js
+			 * 通过webpack-dev-server 可以实现代码改动后的自动打包和刷新页面
+			 * 
+			 * webpack文件入口配置：由于webpack-dev-server启动后默认访问地址为服务器的根目录而不是目标页面，因此可通过html-webapck-plugin插件实现首页控制。
+			 * html-webapck-plugin作用：
+			 * 1、为html文件中引入的外部资源如script、link动态添加每次compile后的hash，防止引用缓存的外部文件问题
+			 * 2、可以生成创建html入口文件，比如单页面可以生成一个html文件入口，配置N个html-webpack-plugin可以生成N个页面入口
+			 * 配置流程：
+			 * 1、运行npm i html-webpack-plugin -d命令，安装生成预览页面的插件
+			 * 2、修改webpack.config头部区域，添加配置信息
+			 * // 导入生成预览页面的插件:
+			 * const HtmlWebpackPlugin = require('html-webpack-plugin')
+			 * //创建对象，得到构造函数
+			 * const htmlPlugin = new HtmlWebpackPlugin({
+			 * //指定复制页面文件
+			 * template:'./src/index.html',
+			 * //制定生成文件名称，该文件存储在内存中，在目录中不显示
+			 * filename:'index.html'
+			 * })
+			 * 3、修改webpack.config向外暴露的配置对象，如下：
+			 *  //打包期间用到的插件列表
+			 * module.exports={
+			 * 	  plugins:[htmlPlugin]
+			 * }
+			 * 配置package.json实现运行后自动打开页面(--open 打包完成后自动打开页面 --host ip地址 --port端口号):
+			 * "dev": "webpack-dev-server --open --host 127.0.0.1 --port 8888"
+			 * 
+			 * 
+			 * loader加载器：
+			 * 由于webpack默认只处理js文件的打包，如果项目中需要对css文件、less文件、png图片等进行处理则需要相应的loader加载器进行webpack打包处理
+			 * 
+			 * 1、npm i style-loader css-loader -d ,安装处理css文件的loader
+			 * 2、配置webpack.config文件的rules数组，添加规则如下：
+			 * //配置loader中第三方文件模块匹配规则
+			 * module:{
+			 * rules:[
+			 * //test：表示匹配的文件类型，可以用正则 ;use表示对应要调用的loader
+			 * 			{test:/\.css$/,use:['style-loader','css-loader']}
+			 * 		 ]
+			 * }
+			 * (注意：loader中配置顺序固定，需要先配style再配置css，调用顺序从后往前也就是先css处理没有再调用style处理)
+			 * (png loader:npm i url-loader file-loader -d (1.文件大小小于limit参数，url-loader将会把文件转为DataURL即base64；2.文件大小大于limit，url-loader会调用file-loader进行处理，参数也会直接传给file-loader。因此我们只需要安装url-loader即可。)
+			 * less loader: npm i less-loader less -d
+			 * sass laoder: npm i sass-loader sass -d)
+			 * postcss插件：
+			 * 自动添加兼容性前缀
+			 * 1、npm i postcss-loader autoprefixer -d
+			 * 2、配置postcss.config.js
+			 * // 从http模块中导入require
+			 * import {require} from "http"
+			 * // 基于nodejs使用的CommonJS模块化规则，用require进行模块导入
+			 * const autoprefixer = require('antoprefixer')
+			 * // 使用module.exports进行模块导出
+			 * module.exports={
+			 * pulgins:[autoprefixer]
+			 * }
+			 * 3、配置webpack.config.js中rules，添加postcss-loader
+			 * 4、npm run dev
 			 * 
 			 * 
 			 * 
-			 * 
-			 * 
-			 * 
-			 * 
-			 * 
-			 * 
-			 * 
-			 */ 
-		</script>
+			 */  
+		 </script>
 	</body>
 </html>
