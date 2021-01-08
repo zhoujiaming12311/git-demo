@@ -163,6 +163,7 @@
 			 * (png loader:npm i url-loader file-loader -d (1.文件大小小于limit参数，url-loader将会把文件转为DataURL即base64；2.文件大小大于limit，url-loader会调用file-loader进行处理，参数也会直接传给file-loader。因此我们只需要安装url-loader即可。)
 			 * less loader: npm i less-loader less -d
 			 * sass laoder: npm i sass-loader sass -d)
+			 * 
 			 * postcss插件：
 			 * 自动添加兼容性前缀
 			 * 1、npm i postcss-loader autoprefixer -d
@@ -177,6 +178,145 @@
 			 * }
 			 * 3、配置webpack.config.js中rules，添加postcss-loader
 			 * 4、npm run dev
+			 * (注意：插件安装后需要配置相关config文件，否则会报错如：you did not set any plugins, parser, or 	  stringifier. Right now, PostCSS does nothing)
+			 * 
+			 * webpack中js高级语法打包:
+			 * 1、安装babel相关的包：npm i babel-loader @babel/core @babel/runtime  -d
+			 * 2、安装babel语法插件：npm i @babel/preset-env @babel/plugin-transform-runtime @babel/
+			 * plugin-proposal-class-properties -d
+			 * 3、在根目录中配置babel.config,
+			 * module.exports = {
+			 *     presets:['@babel/preset-env'],
+			 *     plugins:['@babel/plugin-transform-runtime','@babel/plugin-proposal-class-properties']
+			 * }
+			 * 4、在webpack.config.js的module->rules数组中，添加如下规则：
+			 * {test:/\.js$/,use:'babel-loader',exclude:/node_modules/},
+			 * //exclude设置排除项，表示babel-loader不需要处理node_modules中的js文件（因为node_modules中的js文件
+			 * 属于第三方安装包提供的，不需要转换）
+			 * 
+			 * vue组件加载器：
+			 * 该loader用于实现vue单文件组件加载：
+			 * 1、npm i vue-loader vue-template-complier
+			 * 2、配置webpack.config.js,添加vue-loader配置：
+			 * 1）// 导入VUE loader
+			 * const VueLoaderPlugin =require('vue-loader/lib/plugin')
+			 * 2）module.exports={
+			 *     //打包期间用到的插件列表
+			 *     plugins:[htmlPlugin,new VueLoaderPlugin()],
+			 * 	   //vue loader处理规则
+			 *     {test:/\.vue$/,use:['vue-loader']},
+			 * 	}
+			 * 
+			 * webpack中使用vue:
+			 * 1、安装babel插件,适配高级语法(如上)
+			 * 2、安装vue组件加载器,使webpack可以打包vue文件(如上)
+			 * 3、安装vetur插件,使开发时语法高亮
+			 * 4、安装vue包,使webpack在js中支持vue开发:
+			 * 1)npm i vue -s
+			 * 2)//导入vue构造函数 import Vue from 'vue'
+			 * 3)//导入vue组件 import App from './components/App.vue'
+			 * 4)//es6箭头语法，h中添加要加载的模块
+			 * const vm1=new Vue({
+			 *     el:'#app',
+			 *     render:h=>h(App)
+			 * })
+			 * 
+			 * 关于箭头函数：
+			 * ES6标准新增了一种新的函数：Arrow Function（箭头函数）。	
+			 * 为什么叫Arrow Function？因为它的定义用的就是一个箭头：参数 => 函数体
+			 * 单条的：
+			 * x => x * x
+			 * 上面的箭头函数相当于：
+			 * function (x) {
+			 *     return x * x;
+			 * }
+			 * 多条的：
+			 * x => {
+			 *     if (x > 0) {
+			 *  		return x * x;
+			 * 		}
+			 * 		else {
+			 * 	     	return - x * x;
+			 * 	   }
+			 *	}
+			 * 
+			 * // 两个参数:(x, y) => x * x + y * y
+			 * // 无参数:() => 3.14
+			 * // 可变参数:
+				(x, y, rest) => {
+					var i, sum = x + y;
+					for (i=0; i<rest.length; i++) {
+						sum += rest[i];
+					}
+					return sum;
+				}
+			 * //返回一个对象k = x => ({ foo: x }) k(11)结果为：{foo:11}
+			 * 另外使用箭头函数可以保证函数体中this的指向：箭头函数内部的this是词法作用域，由上下文确定。
+			 * 下面的例子无法得到预期结果：
+
+				var obj = {
+					birth: 1990,
+					getAge: function () {
+						var b = this.birth; // 1990
+						var fn = function () {
+							return new Date().getFullYear() - this.birth; // this指向window或undefined
+						};
+						return fn();
+					}
+				};
+				现在，箭头函数完全修复了this的指向，this总是指向词法作用域，也就是外层调用者obj：
+
+				var obj = {
+					birth: 1990,
+					getAge: function () {
+						var b = this.birth; // 1990
+						var fn = () => new Date().getFullYear() - this.birth; // this指向obj对象
+						return fn();
+					}
+				};
+				obj.getAge(); // 25
+				如果使用箭头函数，以前的那种hack写法：
+
+				var that = this;
+				就不再需要了。
+
+				由于this在箭头函数中已经按照词法作用域绑定了，所以，用call()或者apply()调用箭头函数时，无法对this进行绑定，即传入的第一个参数被忽略：
+
+				var obj = {
+					birth: 1990,
+					getAge: function (year) {
+						var b = this.birth; // 1990
+						var fn = (y) => y - this.birth; // this.birth仍是1990
+						return fn.call({birth:2000}, year);
+					}
+				};
+			 * 排序实现：
+			 * arr.sort((x,y)=>x-y)
+			 * 
+			 * webpack打包发布：
+			 * 在package.json中的script下增加"build":"webpack -p":此时会读取webpack.config.js中的module.export内容如：入口文件entry、输出文件output等信息
+			 * 1、新建js文件
+			 * //简化写法，引入并直接初始化
+				const app = require(express)();
+				//向根路径发起请求
+				app.get('/',(req,res)=>{
+					//返回请求结果
+					res.send('ok');
+				}).listen(3000,()=>{
+					//显示监听信息
+					console.log("running")
+				})
+			 * 2、启动node:node .
+			 * 3、访问:http://localhost:3000/
+			 * 
+			 * ES2015(ES6) 新增加了两个重要的 JavaScript 关键字: let 和 const。
+			 * let 声明的变量只在 let 命令所在的代码块内有效。
+			 * const 声明一个只读的常量，一旦声明，常量的值就不能改变。
+			 * let和const不能重复声明但let可以对值进行改变，const不能。
+			 * let适合for循环时使用，因为let声明变量时相当于局部变量在当前循环内保持有效，而var相当于全局变量每次循环指定的都是同一个变量。
+			 * let 不存在变量提升，var 会变量提升:
+			 * const 声明一个只读变量，声明之后不允许改变。意味着，一旦声明必须初始化，否则会报错。
+			 * 
 			 * 
 			 * 
 			 * 

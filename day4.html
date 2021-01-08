@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+    /**
+     * web开发框架：express
+     * 1.生成package.json文件：npm init -y(-y 表示省略初始化时的问答环节，直接生成package.json)
+     * 2.安装express包：npm i express -s
+     * 3.配置app.js，添加路由控制、返回值处理、listen监听端口
+     * 4.启动express：npm .
+     * 
+     * 托管静态文件：通过如下代码就可以将 public 目录下的图片、CSS 文件、JavaScript 文件对外开放访问
+     * app.use(express.static('public'));  
+     * 1、可以指定虚拟目录2、可以指定多个目录作为静态资源目录 
+     * 在use方法的第一个参数中添加虚拟目录，http://localhost:3000/static/访问：app.use('/static',express.static('public'));
+     * 指定多个目录http://localhost:3000/nihao/hi.html：app.use('/nihao',express.static('hello'))
+     * 
+     * 静态资源：服务器中托管的js、html等静态文件，访问时需要路径+文件名
+     * 动态资源：由服务器动态生成的文件，如路由处理后只访问路径即可得到资源
+     * 
+     * 利用postman插件进行http请求的模拟：
+     * Postman是google开发的一款功能强大的网页调试与发送网页HTTP请求，并能运行测试用例的的Chrome插件。其主要功能包括：
+     * 模拟各种HTTP requests
+     * 从常用的 GET、POST 到 RESTful 的 PUT 、 DELETE …等等。 甚至还可以发送文件、送出额外的 header。
+     * 
+     * 
+     * 
+     * 
+     */
+    </script>
+</body>
+</html>
