@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<title></title>
-	</head>
-	<body>
-	</body>
+
+<head>
+	<meta charset="utf-8">
+	<title></title>
+</head>
+
+<body>
+</body>
+
 </html>
 <script type="text/javascript">
 	/**
@@ -26,10 +29,10 @@
 			AlbumName: "shanghai",
 			Entered: "5/9/2013"
 		},
-		success: function(result) {
+		success: function (result) {
 			alert(result);
 		},
-		error: function(xhr, status, p3, p4) {
+		error: function (xhr, status, p3, p4) {
 			var err = "Error " + " " + status + " " + p3;
 			if (xhr.responseText && xhr.responseText[0] == "{")
 				err = JSON.parse(xhr.responseText).message;
@@ -46,7 +49,7 @@
 			AlbumName: "shanghai",
 			Entered: "5/9/2013"
 		},
-		success: function(result) {
+		success: function (result) {
 			alert(result);
 			//嵌套调用
 			$.ajax({
@@ -57,10 +60,10 @@
 					AlbumName: "shanghai",
 					Entered: "5/9/2013"
 				},
-				success: function(result) {
+				success: function (result) {
 					alert(result);
 				},
-				error: function(xhr, status, p3, p4) {
+				error: function (xhr, status, p3, p4) {
 					var err = "Error " + " " + status + " " + p3;
 					if (xhr.responseText && xhr.responseText[0] == "{")
 						err = JSON.parse(xhr.responseText).message;
@@ -69,12 +72,12 @@
 			});
 		}
 	},
-	error: function(xhr, status, p3, p4) {
-		var err = "Error " + " " + status + " " + p3;
-		if (xhr.responseText && xhr.responseText[0] == "{")
-			err = JSON.parse(xhr.responseText).message;
-		alert(err);
-	}
+		error: function (xhr, status, p3, p4) {
+			var err = "Error " + " " + status + " " + p3;
+			if (xhr.responseText && xhr.responseText[0] == "{")
+				err = JSON.parse(xhr.responseText).message;
+			alert(err);
+		}
 	});
 	}
 	// 用回调函数解决异步加载过程中函数调用问题
@@ -84,7 +87,7 @@
 			url: '${root}/saveOrUpdate.do',
 			type: "post",
 			async: true,
-			success: function(result) {
+			success: function (result) {
 				if (callback != undefined) {
 					callback(true);
 				}
@@ -112,10 +115,29 @@
 	 * 
 	 * console.log()会在浏览器控制台打印出信息
 	 * console.dir()可以显示一个对象的所有属性和方法
-	 * */
+	 *  
+	 * then 参数中的函数返回值
+	 * 1、返回Promise实例对象：返回的该实例对象会调用下一个then
+	 * 2、返回普通值：返回的普通值会传递给下一个then,通过then的参数中函数的参数接收该值
+	 * 
+	 * Promise常用api：
+	 * 1、then接收成功信息
+	 * 2、catch捕捉异常信息
+	 * 3、finally无论成功或失败都执行
+	 * 4、Promise.all()并发处理多个异步任务，所有任务都要执行完毕才能得到结果
+	 * 5、Promise.race()并发处理多个异步任务，只要有一个任务完成就能得到结果
+	 * 
+	 * fetch概述:
+	 * 1、基本特性：更加简单的数据获取方式，功能更强大更灵活，可以看做是xhr的升级版
+	 * 2、基于Promise语法实现
+	 * 3、fetch响应结果：
+	 * 1)text()返回体处理为字符串
+	 * 2)json()返回体处理为json对象，相当于json.parse(responseText)
+	 * 
+	*/
 
-	var p = new Promise(function(resolve, reject) {
-		setTimeout(function() {
+	var p = new Promise(function (resolve, reject) {
+		setTimeout(function () {
 			var flag = true;
 			if (flag) {
 				// 成功处理
@@ -127,37 +149,175 @@
 		}, 1000)
 	})
 	// p.then获取处理结果 data关联resolve/reject内容
-	p.then(function(data) {
+	p.then(function (data) {
 		console.log("success" + data)
-	}, function(info) {
+	}, function (info) {
 		console.log("failure" + info)
 	})
 	//链式调用处理多次回调，由回调处理转变成线式调用，增加代码可读性
 	//发送多个ajax请求并且保证顺序
 	queryData('http://localhost:3000/data')
-		.then(function(data) {
+		.then(function (data) {
 			//接收queryData return结果 data
 			console.log(data)
 			return queryData('http://localhost:3000/data1');
 		})
-		.then(function(data) {
+		.then(function (data) {
 			//接收上一个return结果 data1
 			console.log(data)
 			return queryData('http://localhost:3000/data2');
 		})
-		.then(function(data) {
+		.then(function (data) {
 			//接收上一个return结果 data2
 			console.log(data)
 		})
+
+	//fetch 报文
+	/**
+   * fetch:fetch是一种HTTP数据请求的方式,是XMLHttpRequest的一种替代方案。 fetch不是ajax的进一步封装,而是原生js。
+   * fetch的优点：
+   * 1.符合关注分离，没有将输入、输出和用事件来跟踪的状态混杂在一个对象里
+   * 2.更好更方便的写法
+  */
+	//get请求
+	// fetch('http://localhost:3000/login2?username=admin&password=123').then(function (data) {
+	//     //text()方法属于fetchAPI的一部分，它返回一个Promise实例对象，用于获取后台返回的数据
+	//     return data.text();
+	// }).then(function (data) {
+	//     //这里得到的才是最终的数据
+	//     console.log(data);
+	// })
+
+	/*
+		Restful是什么
+		中文名称：表现层状态转化。用 URL 表示要操作的资源，用不同的 HTTP 请求（GET，POST，PUT，DELETE）描述对资源的操作，
+		通过 HTTP 的状态码来判断此次对资源操作的结果，这就是 Restful风格。
+		Restful 风格是对请求的一次解耦，提高了 url 的重用性。
+		(使用时可理解为:url是地址+?+参数1+&+参数2，restful是地址+/+参数1+/+参数2)
+	 */
+	// fetch('http://localhost:3000/login2/admin/123',{
+	//     //get delete 
+	//     method:'get'
+	// })
+	// .then(function (data) {
+	//     //text()方法属于fetchAPI的一部分，它返回一个Promise实例对象，用于获取后台返回的数据
+	//     return data.text();
+	// }).then(function (data) {
+	//     //这里得到的才是最终的数据
+	//     console.log(data);
+	// })
+
+
+	fetch('http://localhost:3000/login2/12231231', {
+		//post
+			method: 'put',
+			//url格式
+			// body:'username=admin&password=123',
+			//json格式
+			body: JSON.stringify({
+				username: 'admin',
+				password: '123'
+			}),
+			//请求头类型
+			headers: {
+				//url格式
+				//"Content-type":"application/x-www-form-urlencoded"
+				//json格式
+				"Content-type": "application/json"
+			}
+		}).then(function (data) {
+			//text()方法属于fetchAPI的一部分，它返回一个Promise实例对象，用于获取后台返回的数据
+			//text()方法会将返回体处理成文本    
+			// return data.text();
+			//text()方法会将返回体处理成json对象  
+			return data.json();
+		}).then(function (data) {
+			//这里得到的才是最终的数据
+			console.log(data);
+		})
+
+	/**
+	 * axios发送报文
+	 * axios的概念：axios是基于promise（诺言）用于浏览器和node.js是http客户端。
+	 * axios的作用：axios主要是用于向后台发起请求的，还有在请求中做更多是可控功能。
+	 * axios的特点：1、支持浏览器和node.js 2、支持promise 3、能拦截请求和响应 4、能转换请求和响应数据 5、能取消请求 6、自动转换JSON数据 7、浏览器支持防止CSRF（跨站请求伪造）
+	 * 
+	 * 响应结果的主要属性：
+	 * 1、data:实际响应回来的数据
+	 * 2、headers:响应头信息
+	 * 3、status:响应状态码
+	 * 4、statusText:响应状态信息
+	 * 
+	 * axios的全局配置:
+	 * 	// 超时时间
+	 * axios.defaults.timeout = 3000
+	 *  // 配置请求的基本url地址
+	 * axios.defaults.baseURL ='http://localhost:3000/';
+	 *  // 配置请求头信息,配置后请求头中会多出mytoken属性
+	 *  axios.defaults.headers['mytoken'] ='hello'
+	 * 
+	 * 拦截器：在请求或响应被 then 或 catch 处理前拦截它们（拦截器可以做什么：在请求或者响应时拦截下来进行处理）
+	 * 拦截器分为请求拦截器和响应拦截器：
+	 * 1、请求拦截器（interceptors.requst）是指可以拦截每次或指定HTTP请求，并可修改配置项。
+	 * 在请求发出前设置一些信息：页面-> axios(请求拦截器)-> 服务器
+	 * 2、响应拦截器（interceptors.response）可以在每次HTTP请求后拦截住每次或指定HTTP请求，并可修改返回结果项。
+	 * 在获取数据之前对数据做一些加工处理：服务器-> axios(响应拦截器) ->页面 
+	 * get、delete传参：分为url方式和params方式
+	 * url方式:axios.get('http://localhost:3000/adata?username=admin').then(function(ret){
+            // ret中保存后台响应信息
+            console.log(ret)
+            console.log(ret.data)
+		})
+		 
+		params方式:
+		axios.get('http://localhost:3000/adata',{
+            params:{
+                username:'get',
+                password:'123'
+            }
+        })
+	 * post、put传参：分为选项传参(默认格式为json) 和 表单形式UrlSearchParams(application/x-www-form-urlencoded)
+		选项传参:axios.post('http://localhost:3000/adata',{
+            username:'postJson',
+            password:'123'
+        })
+        .then(function(ret){
+            // ret中保存后台响应信息
+            console.log(ret)
+            console.log(ret.data)
+        }) 
+	*/
+	
+	/*
+		async/await的基本用法：
+		1、async/await是es7引入的新语法，可以更加方便的进行异步操作
+		2、async关键字用于函数上(async函数的返回值是Promise实例对象)
+		3、await关键字用于async函数中(await可以得到异步的结果)
+
+		
+	 */
+
+	/**
+	 * 谷歌浏览器时间解析
+	 * Time: 请求或下载的时间，从发起Request到获取到Response所用的总时间。
+	 * Domcontentloaded：到下解析HTML结构到末尾的封闭标签，DOM树构建完成
+	 * load：DOM树构建完成后，继续加载 html/css 中的外部资源，加载完成之后，视为页面加载完成
+	 * finish：是页面上所有http请求发送响应的时间，并发量是6个，即finish是这六个并发量(包括js、css、doc、img等资源)。
+	 * 总结：
+	 * 1.如果finish的时间比较大。说明页面上的请求资源比较大，需要优化
+	 * 2.finish和domcontentload、load没有直接的关系
+	 * 3.load:刷新重新载入的时间  Time: Request到获取到Response所用的总时间。
+	*/
+
 	/**
 		 * git架构：
 		 * git仓库：存放项目的地方
 		 * 暂存区：临时存放被修改的文件，大意指git存放每一次修改后的文件的位置
 		 * 工作目录：被git管理的项目目录，即写代码的地方
-		 * 
+		 *
 		 * 提交流程：
 		 * 工作目录（修改的文件）->暂存区->git仓库
-		 * 
+		 *
 		 * 本地仓库：
 		 * git配置：
 		 * 1、配置提交人姓名：git config --global user.name
@@ -173,7 +333,7 @@
 		 * 1、git init 初始化git仓库
 		 * 2、git status 查看文件状态（git状态：管理/未管理，提醒开发者哪些未管理的文件需要管理）
 		 * 3、git add 追踪文件列表名  追踪文件（将要追踪的文件添加到暂存区中）
-		 * eg：$  git add day1.html 
+		 * eg：$  git add day1.html
 		 * warning: LF will be replaced by CRLF in day1.html.
 		 * The file will have its original line endings in your working directory
 		 * 原因是windows系统的换行符和Unix下的换行符不同，但是git会帮我们自动进行换行符的转换，所以出现了这个warning
@@ -181,7 +341,7 @@
 		 * 4、git commit -m 提交信息 向仓库提交代码（将暂存区中的文件提交到工作仓库中。原则为每次只提交一个功能不要一次提交多个或这功能中包含bug的修改，因为会导致回退时其他功能或bug被一同回退）
 		 * eg：$ git commit -m 第一次提交
 		 * *** Please tell me who you are.
-		 * Run 
+		 * Run
 		 * git config --global user.email "you@example.com"
 		 * git config --global user.name "Your Name"
 		 * 解决方法：当前文件夹下有个隐藏的.git文件夹，修改其中的config文件，末尾加入：
@@ -190,25 +350,25 @@
 		 * 		email = zhoujm@yusys.com.cn
 		 * 5、git log 查看提交记录
 		 * 6、git reset --hard commitID 根据id将指定记录恢复，并覆盖暂存区和工作目录
-		 * 
+		 *
 		 * git撤销（撤销至最新一次add（可多次撤销至该节点）：即程序有问题想恢复到上一次正确的add提交版本）：git checkout 文件名(此时git status可查看当前状态)
 		 * git删除（删除暂存区文件中即add的文件：即add提交有问题不想让本次add提交存在）:git rm --cached 文件名
 		 * git恢复(从仓库中恢复指定记录，并覆盖暂存区和工作目录，即当前程序有问题且git提交的版本也有问题，想要恢复一个指定的版本)：git reset --hard commitID
 		 * (git reset --hard commid_id该操作为强制回退到某一次历史commit的版本，并清除本地修改！执行后会清除该版本之前的所有记录，因此执行前每次必须commit！)
 		 * (一、没有commit，没有add 对不起，找不回了，放弃吧。
 		 * 二、没有commit，但是有add操作（建议git add –all） 执行：git fsck --lost-found)（找回本地仓库里边最近add的60或更多个文件:find .git/objects -type f | xargs ls -lt | sed 60q）
-		 * 三、执行过commit 1、git  reflog找到回退信息 2、git reset --hard HEAD@{回退位置} 
-		 * 
-		 * 
+		 * 三、执行过commit 1、git  reflog找到回退信息 2、git reset --hard HEAD@{回退位置}
+		 *
+		 *
 		 * git分支branch：
 		 * 主分支master：第一次向git仓库中提交的分支，一般用于上线发布
 		 * 开发分支develop：作文开发的分支，基于主分支的分支创建，等待测试验证后与与主分支合并上线。
 		 * 功能分支feature：基于开发分支创建，用于开发具体的功能，在开发完成后合并到开发分支
 		 * 功能分支->开发分支->主分支
-		 * 
+		 *
 		 * 查看分支：git branch(* master *表示当前所属分支)
 		 * 创建分支：git branch develop
-		 * 切换分支：git checkout develop（切换前需要将未提交的文件提交，否则不通过） 
+		 * 切换分支：git checkout develop（切换前需要将未提交的文件提交，否则不通过）
 		 * 在Git bush中进行分支合并时出现error:Merging is not possible because you have unmerged files.的错误
 		 * 解决方法：
 		 * 1、在master上添加文件git add (文件名)，然后提交文件git commit -m “(说明备注)”。
@@ -217,11 +377,11 @@
 		 * （切换分支后默认显示当前分支下最新版本记录）
 		 * 合并分支：git merge develop
 		 * （合并后master分支1，2，3，4，5）
-		 * 
-		 * 删除分支	： 
+		 *
+		 * 删除分支	：
 		 * git branch -d 分支名（删除前如果版本不一致需要进行merge，否则不通过）
 		 * git branch -D 分支名(强制删除，无论是否存在冲突)
-		 * 
+		 *
 		 * 暂时保存更改(适用于在分支上写程序时没写完却不想保存，但此时需要切换到其他分支干别的事情，此时可以放到临时工作区里（相当于剪切板）)：
 		 * 在git中暂时提取当前分支上所有改动的内容并存储，让开发人员能够得到一个干净的副本（即当时你改动的所有内容），临时转向其他的工作
 		 * 存储临时改动：git stash
@@ -236,11 +396,11 @@
 		 * (use "git add <file>..." to update what will be committed)
 		 * (use "git restore <file>..." to discard changes in working directory)
 		 * modified:   day2.html
-		 * 
+		 *
 		 * 此时$ git add --all ->$ git stash pop
-		 * 结果会将两个分支临时内容都恢复到当前目录	
-		 * 
-		 * 
+		 * 结果会将两个分支临时内容都恢复到当前目录
+		 *
+		 *
 		 * 远程仓库（多人开发时使用）：
 		 * 1、A在自己计算机中创建本地仓库
 		 * 2、A在github中建立远程仓库
@@ -248,26 +408,26 @@
 		 * 4、B克隆clone远程仓库到本地进行开发(clone创建本地副本)
 		 * 5、B将本地仓库中开发内容推送PUSH到远程仓库(push更新版本)
 		 * 6、A/B将远程仓库中的最新内容拉去pull本地(pull获取最新版本)
-		 * 
-		 * 
+		 *
+		 *
 		 * push推送：$ git push 远程地址（https://github.com/zhoujiaming12311/git-demo.git） 分支名（master）
 		 * (免密登录：输入git config --global credential.helper store，可以在首次登录之后将登录信息存储在本地，此后不再弹出登录框)
 		 * (给远程仓库起别名：git remote add 别名(origin) 远程地址(https://github.com/zhoujiaming12311/git-demo.git) )
 		 * push简写：
 		 * 1、git push -u origin master：通过u参数可以简化push内容，下次输入时直接push就行
 		 * 2、git push
-		 * 
+		 *
 		 * clone克隆：$ git clone https://github.com/zhoujiaming12311/git-demo.git
 		 * pull拉取：拉取远程仓库中最新的版本
-		 * 
+		 *
 		 * push冲突：
 		 *  ! [rejected]        master -> master (non-fast-forward)
 		 * error: failed to push some refs to 'https://github.com/zhoujiaming12311/git-demo.git'
 		 * 解决冲突：
 		 * 需要修改后重新提交
-		 * 
-		 * 
-		 * 
-		 * 
+		 *
+		 *
+		 *
+		 *
 		 */
 </script>
